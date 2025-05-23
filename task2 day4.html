@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task 2 - Day 4</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom right, #5cb1a6, #6dc1b5);
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    }
+    h2 { text-align: center; color: #2c3e50; }
+    .section-title {
+      font-size: 20px;
+      margin-top: 30px;
+      margin-bottom: 12px;
+      color: #34495e;
+      border-bottom: 2px solid #4caf91;
+      padding-bottom: 4px;
+    }
+    .question { margin-bottom: 25px; }
+    .english {
+      font-size: 16px;
+      margin-bottom: 6px;
+      line-height: 1.6;
+    }
+    .translation {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 6px;
+    }
+    input[type="text"] {
+      width: 140px;
+      padding: 6px;
+      margin: 0 3px;
+      font-size: 15px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+    }
+    .check-btn {
+      margin-top: 6px;
+      background: #4caf91;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .feedback {
+      margin-top: 6px;
+      font-weight: bold;
+    }
+    .example {
+      margin-top: 4px;
+      font-style: italic;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .correct { color: green; }
+    .incorrect { color: red; }
+    @media (max-width: 600px) {
+      input[type="text"] {
+        width: 100px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Task 2 - Day 4</h2>
+
+    <div class="section-title">一. 句子填空</div>
+
+    <div class="question" id="q1"></div>
+    <div class="question" id="q2"></div>
+    <div class="question" id="q3"></div>
+
+    <div class="section-title">二. 科技类短语（中译英 + 雅思例句）</div>
+
+    <div class="question"><div class="english">1. 监控摄像头：</div><input type="text" id="p1"><button class="check-btn" onclick="checkPhrase('p1', 'security camera')">Check</button><div class="feedback" id="fb_p1"></div></div>
+    <div class="question"><div class="english">2. 震慑作用：</div><input type="text" id="p2"><button class="check-btn" onclick="checkPhrase('p2', 'act as a deterrent')">Check</button><div class="feedback" id="fb_p2"></div></div>
+    <div class="question"><div class="english">3. 提高生产力/效率：</div><input type="text" id="p3"><button class="check-btn" onclick="checkPhrase('p3', 'improve productivity')">Check</button><div class="feedback" id="fb_p3"></div></div>
+    <div class="question"><div class="english">4. 取代人类劳动力：</div><input type="text" id="p4"><button class="check-btn" onclick="checkPhrase('p4', 'replace human labor')">Check</button><div class="feedback" id="fb_p4"></div></div>
+    <div class="question"><div class="english">5. 高科技设施/产品：</div><input type="text" id="p5"><button class="check-btn" onclick="checkPhrase('p5', 'high-tech products')">Check</button><div class="feedback" id="fb_p5"></div></div>
+  </div>
+
+  <script>
+    const examples = {
+      p1: { en: "Security cameras are installed in public places to prevent crime.", zh: "公共场所安装了监控摄像头以防止犯罪。" },
+      p2: { en: "Strict punishments act as a deterrent to potential criminals.", zh: "严厉的惩罚对潜在罪犯起到震慑作用。" },
+      p3: { en: "Automation can significantly improve productivity in manufacturing.", zh: "自动化可以显著提高制造业的生产力。" },
+      p4: { en: "Many fear that robots may replace human labor in the future.", zh: "许多人担心未来机器人将取代人类劳动力。" },
+      p5: { en: "High-tech products have become essential in our daily lives.", zh: "高科技产品已经成为我们日常生活中不可或缺的一部分。" }
+    };
+
+    function checkPhrase(id, answer) {
+      const feedback = document.getElementById("fb_" + id);
+      const value = document.getElementById(id).value.trim().toLowerCase();
+      const correctAnswer = answer.toLowerCase();
+      const example = examples[id];
+      let html = (value === correctAnswer)
+        ? `<span class='correct'>✔ 正确！</span>`
+        : `<span class='incorrect'>✘ 错误</span> 正确答案：${answer}`;
+      if (example) {
+        html += `<div class='example'>例句：${example.en}<br>翻译：${example.zh}</div>`;
+      }
+      feedback.innerHTML = html;
+    }
+
+    function getRandomIndexes(array, count) {
+      const set = new Set();
+      while (set.size < count && set.size < array.length) {
+        const i = Math.floor(Math.random() * array.length);
+        const word = array[i].replace(/[.,]/g, '');
+        if (!word.match(/^[.,]$/) && word.length > 2) set.add(i);
+      }
+      return Array.from(set);
+    }
+
+    function renderSentence(id, sentence, translation, containerId, blanksCount = 5) {
+      const container = document.getElementById(containerId);
+      const words = sentence.split(" ");
+      const blankIndexes = getRandomIndexes(words, blanksCount);
+      const answers = {};
+      const html = words.map((word, i) => {
+        const clean = word.replace(/[.,]/g, "");
+        const punct = word.endsWith(",") ? "," : word.endsWith(".") ? "." : "";
+        if (blankIndexes.includes(i)) {
+          const inputId = `${id}_${i}`;
+          answers[inputId] = clean.toLowerCase();
+          return `<input type="text" id="${inputId}" placeholder="...">${punct}`;
+        }
+        return word;
+      }).join(" ");
+      container.innerHTML = `
+        <div class="english">${html}</div>
+        <div class="translation">${translation}</div>
+        <button class="check-btn" onclick='checkSentence("${id}", ${JSON.stringify(answers)})'>Check</button>
+        <div class="feedback" id="fb_${id}"></div>
+      `;
+    }
+
+    function checkSentence(id, answers) {
+      let correct = true;
+      for (const [inputId, answer] of Object.entries(answers)) {
+        const val = document.getElementById(inputId).value.trim().toLowerCase();
+        if (val !== answer) correct = false;
+      }
+      const fb = document.getElementById("fb_" + id);
+      fb.innerHTML = correct
+        ? "<span class='correct'>✔ 全部正确！</span>"
+        : `<span class='incorrect'>✘ 有错误</span> 正确答案：${Object.values(answers).join(" / ")}`;
+    }
+
+    // 渲染句子
+    renderSentence("s1",
+      "Working from home makes it difficult for a manager to monitor the performance of teleworkers, and people who adopt this work arrangement often find it hard to gain recognition through promotions or performance reviews.",
+      "远程工作的员工难以被监控，升职与考核中他们的努力也难被认可。",
+      "q1"
+    );
+
+    renderSentence("s2",
+      "The use of Internet for banking, social networking, or other services often makes our personal information vulnerable to theft.",
+      "网络交易让我们的信息容易被盗。",
+      "q2"
+    );
+
+    renderSentence("s3",
+      "The distance-learning courses are much cheaper and the timetable can be arranged more flexibly.",
+      "远程学习课程更便宜，时间更灵活。",
+      "q3"
+    );
+  </script>
+</body>
+</html>
